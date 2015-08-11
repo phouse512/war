@@ -6,15 +6,17 @@ var http = require('http'),
 	passport = require('passport'),
 	flash = require('connect-flash');
 
+// grab global so we can the io connection to everywhere
+var global = require('./global.js');
 
 var app = express();
 
 
 var handlebars = require('express3-handlebars').create({
 	defaultLayout: 'main',
-	helperes: {
+	helpers: {
 		static: function(name) {
-			return('./lib/static.js').map(name);
+			return require('./lib/static.js').map(name);
 		},
 		json: function(context) {
 			return JSON.stringify(context);
@@ -57,7 +59,7 @@ switch(app.get('env')){
 }
 
 app.use(function(req, res, next){
-	res.locals.showTests = app.get('env') !+= 'production' && res.req.query.test === '1';
+	res.locals.showTests = app.get('env') != 'production' && res.req.query.test === '1';
 	next();
 });
 
@@ -69,6 +71,10 @@ app.use(bodyParser());
 app.use(session({ secret: 'war' }));
 
 app.use(flash());
+
+// set up global socket
+var io = require('socket.io')(http);
+global.io = io;
 
 // register routes
 require('./routes.js')(app);
