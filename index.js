@@ -8,6 +8,7 @@ var http = require('http'),
 
 // grab global so we can the io connection to everywhere
 var global = require('./global.js');
+var game_server = require('./lib/game.server');
 
 var app = express();
 
@@ -72,9 +73,7 @@ app.use(session({ secret: 'war' }));
 
 app.use(flash());
 
-// set up global socket
-var io = require('socket.io')(http);
-global.io = io;
+
 
 // register routes
 require('./routes.js')(app);
@@ -92,10 +91,16 @@ app.use(function(err, req, res, next){
 	res.render('500');
 });
 
-http.createServer(app).listen(app.get('port'), function(){
+var server = http.createServer(app).listen(app.get('port'), function(){
 	console.log('Express started in ' + app.get('env') + ' on http://localhost:' + 
 		app.get('port') + '; press Ctrl-C to terminate.');
 });
 
+
+// set up global socket
+var io = require('socket.io').listen(server);
+global.io = io;
+
+var local_server = new game_server.game_server();
 
 
