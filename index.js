@@ -8,7 +8,7 @@ var http = require('http'),
 
 // grab global so we can the io connection to everywhere
 var global = require('./global.js');
-var game_server = require('./lib/game.server');
+var GameServer = require('./lib/game.server');
 
 var app = express();
 
@@ -101,6 +101,6 @@ var server = http.createServer(app).listen(app.get('port'), function(){
 var io = require('socket.io').listen(server);
 global.io = io;
 
-var local_server = new game_server.game_server();
+var local_server = new GameServer();
 
 
